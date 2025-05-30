@@ -3,150 +3,479 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ester Hydrolysis Rate Constant Simulator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <title>Ester Hydrolysis Kinetics Virtual Lab</title>
     <style>
-        .custom-radio input:checked + label {
-            background-color: #3b82f6;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 400px 1fr; /* Wider control panel */
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+        
+        header {
+            grid-column: 1 / 3;
+            background-color: #2c3e50;
             color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .reaction-flask {
-            animation: bubble 2s infinite;
+        
+        .control-panel {
+            background-color: white;
+            padding: 20px; /* More padding */
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
         }
-        @keyframes bubble {
+        
+        .simulation-area {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 10px;
+        }
+        
+        .reaction-visualization {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .assistant {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 120px;
+            background-image: url('https://cdn.pixabay.com/photo/2016/03/31/19/58/avatar-1295429_960_720.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            cursor: pointer;
+        }
+        
+        .speech-bubble {
+            position: absolute;
+            bottom: 120px;
+            right: 0;
+            width: 200px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 20px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent;
+        }
+        
+        .data-display {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 300px;
+        }
+        
+        .flask {
+            width: 150px;
+            height: 200px;
+            background-color: #e6f7ff;
+            border: 3px solid #3498db;
+            border-radius: 60px 60px 0 0;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(52, 152, 219, 0.5);
+            transition: height 1s;
+        }
+        
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .bubble {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: rise linear infinite;
+        }
+        
+        @keyframes rise {
+            0% { bottom: 0; opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { bottom: 100%; opacity: 0; }
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px; /* More space between controls */
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .value-display {
+            text-align: right;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+            font-size: 0.9em;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .progress-container {
+            margin: 15px 0;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            height: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .results {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .results h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        
+        .tab-container {
+            margin-top: 15px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab-button {
+            padding: 10px 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            color: #3498db;
+            font-size: 0.9em;
+        }
+        
+        .tab-button.active {
+            border-bottom: 3px solid #3498db;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Test tube styles */
+        .test-tube-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .test-tube {
+            width: 80px; /* Wider test tubes */
+            height: 140px; /* Taller test tubes */
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 2px solid #ccc;
+            border-radius: 0 0 15px 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        
+        .test-tube::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 0 0 12px 12px;
+        }
+        
+        .test-tube.selected {
+            border-color: #3498db;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+            transform: translateY(-5px);
+        }
+        
+        .test-tube-liquid {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            border-radius: 0 0 12px 12px;
+            transition: height 0.3s;
+        }
+        
+        .test-tube-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        /* Specific ester colors */
+        .methyl-liquid {
+            background-color: rgba(100, 200, 150, 0.7);
+            height: 80%;
+        }
+        
+        .ethyl-liquid {
+            background-color: rgba(200, 150, 100, 0.7);
+            height: 80%;
+        }
+        
+        .propyl-liquid {
+            background-color: rgba(150, 100, 200, 0.7);
+            height: 80%;
+        }
+        
+        /* Assistant animation */
+        @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
         }
-        .thermometer {
-            transition: height 0.5s ease;
+        
+        .assistant.talking {
+            animation: bounce 0.5s infinite;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-blue-800 mb-2">Ester Hydrolysis Rate Constant Simulator</h1>
-            <p class="text-lg text-gray-600">Interactive simulation for determining the rate constant of ester hydrolysis reactions</p>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Ester Hydrolysis Kinetics Virtual Lab</h1>
+                <p>Determine the rate constant of ester hydrolysis reactions</p>
+            </div>
+            <button id="help-btn" style="background-color: #e67e22;">Help</button>
         </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Control Panel -->
-            <div class="bg-white p-6 rounded-xl shadow-lg">
-                <h2 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Experiment Controls</h2>
+        
+        <div class="control-panel">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Select Ester:</label>
+                    <div class="test-tube-container">
+                        <div class="test-tube" id="methyl-tube" data-ester="methyl">
+                            <div class="test-tube-liquid methyl-liquid"></div>
+                            <div class="test-tube-label">Methyl Acetate</div>
+                        </div>
+                        <div class="test-tube selected" id="ethyl-tube" data-ester="ethyl">
+                            <div class="test-tube-liquid ethyl-liquid"></div>
+                            <div class="test-tube-label">Ethyl Acetate</div>
+                        </div>
+                        <div class="test-tube" id="propyl-tube" data-ester="propyl">
+                            <div class="test-tube-liquid propyl-liquid"></div>
+                            <div class="test-tube-label">Propyl Acetate</div>
+                        </div>
+                    </div>
+                </div>
                 
-                <div class="mb-6">
-                    <label class="block text-gray-700 mb-2">Ester Type</label>
-                    <select id="ester-type" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
-                        <option value="methyl-acetate">Methyl Acetate</option>
-                        <option value="ethyl-acetate">Ethyl Acetate</option>
-                        <option value="propyl-acetate">Propyl Acetate</option>
-                        <option value="butyl-acetate">Butyl Acetate</option>
-                    </select>
-                </div>
-
-                <div class="mb-6">
-                    <label class="block text-gray-700 mb-2">Temperature (°C)</label>
-                    <input type="range" id="temperature" min="20" max="80" value="25" class="w-full mb-2">
-                    <div class="flex justify-between">
-                        <span>20°C</span>
-                        <span id="temp-value" class="font-bold">25°C</span>
-                        <span>80°C</span>
+                <div class="control-group">
+                    <label>Hydrolysis Condition:</label>
+                    <div>
+                        <input type="radio" id="acidic" name="condition" value="acidic">
+                        <label for="acidic" style="display: inline;">Acidic (HCl)</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="basic" name="condition" value="basic" checked>
+                        <label for="basic" style="display: inline;">Basic (NaOH)</label>
                     </div>
                 </div>
-
-                <div class="mb-6">
-                    <label class="block text-gray-700 mb-2">NaOH Concentration (M)</label>
-                    <div class="flex space-x-4">
-                        <div class="custom-radio flex-1">
-                            <input type="radio" name="concentration" id="conc-01" value="0.1" checked class="hidden">
-                            <label for="conc-01" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">0.1 M</label>
-                        </div>
-                        <div class="custom-radio flex-1">
-                            <input type="radio" name="concentration" id="conc-02" value="0.2" class="hidden">
-                            <label for="conc-02" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">0.2 M</label>
-                        </div>
-                        <div class="custom-radio flex-1">
-                            <input type="radio" name="concentration" id="conc-05" value="0.5" class="hidden">
-                            <label for="conc-05" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">0.5 M</label>
-                        </div>
-                    </div>
+                
+                <div class="control-group">
+                    <label for="ester-conc">Ester Concentration (M):</label>
+                    <input type="range" id="ester-conc" min="0.1" max="1.0" step="0.1" value="0.5">
+                    <div class="value-display" id="ester-conc-value">0.5 M</div>
                 </div>
-
-                <div class="mb-6">
-                    <label class="block text-gray-700 mb-2">Reaction Order</label>
-                    <div class="flex space-x-4">
-                        <div class="custom-radio flex-1">
-                            <input type="radio" name="order" id="order-1" value="1" checked class="hidden">
-                            <label for="order-1" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">First Order</label>
-                        </div>
-                        <div class="custom-radio flex-1">
-                            <input type="radio" name="order" id="order-2" value="2" class="hidden">
-                            <label for="order-2" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">Second Order</label>
-                        </div>
-                    </div>
+                
+                <div class="control-group">
+                    <label for="catalyst-conc">Catalyst Concentration (M):</label>
+                    <input type="range" id="catalyst-conc" min="0.05" max="0.5" step="0.05" value="0.2">
+                    <div class="value-display" id="catalyst-conc-value">0.2 M</div>
                 </div>
-
-                <button id="start-experiment" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition duration-300 flex items-center justify-center">
-                    <i class="fas fa-flask mr-2"></i> Start Experiment
-                </button>
-
-                <div id="results" class="mt-6 hidden">
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h3 class="font-bold text-blue-800 mb-2">Results</h3>
-                        <p class="mb-1">Rate Constant (k): <span id="k-value" class="font-bold">0.00</span> M<sup>-1</sup>s<sup>-1</sup></p>
-                        <p class="mb-1">Half-life (t<sub>½</sub>): <span id="half-life" class="font-bold">0.00</span> s</p>
-                        <p>Activation Energy (E<sub>a</sub>): <span id="activation-energy" class="font-bold">0.00</span> kJ/mol</p>
-                    </div>
+                
+                <div class="control-group">
+                    <label for="temperature">Temperature (°C):</label>
+                    <input type="range" id="temperature" min="25" max="60" step="5" value="40">
+                    <div class="value-display" id="temperature-value">40 °C</div>
+                </div>
+                
+                <div class="control-group">
+                    <button id="start-btn">Start Reaction</button>
+                    <button id="pause-btn" disabled>Pause</button>
+                    <button id="reset-btn">Reset</button>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
                 </div>
             </div>
-
-            <!-- Visualization Area -->
-            <div class="lg:col-span-2">
-                <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
-                    <h2 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Reaction Progress</h2>
-                    <div class="flex flex-col md:flex-row items-center justify-between">
-                        <div class="relative w-48 h-64 mb-4 md:mb-0">
-                            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-40 bg-blue-100 rounded-b-full border border-gray-300 overflow-hidden">
-                                <div id="reaction-mixture" class="absolute bottom-0 w-full h-3/4 bg-yellow-100"></div>
-                                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center reaction-flask">
-                                    <i class="fas fa-temperature-high text-red-500"></i>
-                                </div>
-                            </div>
-                            <div class="absolute -right-4 top-8 w-6 h-40 bg-gray-200 rounded-full border border-gray-400">
-                                <div id="thermometer" class="absolute bottom-0 w-full bg-red-500 rounded-full thermometer" style="height: 20%;"></div>
-                            </div>
-                        </div>
-                        <div class="flex-1 w-full">
-                            <canvas id="concentration-chart" height="250"></canvas>
-                        </div>
-                    </div>
+            
+            <div class="results">
+                <h3>Results</h3>
+                <div id="rate-constant">Rate Constant (k): --</div>
+                <div id="half-life">Half-life (t<sub>½</sub>): --</div>
+                <div id="reaction-order">Reaction Order: --</div>
+            </div>
+        </div>
+        
+        <div class="simulation-area">
+            <div class="reaction-visualization">
+                <h2>Reaction Flask</h2>
+                <div class="flask">
+                    <div class="liquid" id="liquid"></div>
+                    <div class="bubbles" id="bubbles"></div>
                 </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Data Analysis</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <canvas id="rate-plot" height="200"></canvas>
-                            <p class="text-center text-sm text-gray-600 mt-2">Integrated Rate Law Plot</p>
-                        </div>
-                        <div>
-                            <canvas id="arrhenius-plot" height="200"></canvas>
-                            <p class="text-center text-sm text-gray-600 mt-2">Arrhenius Plot</p>
-                        </div>
+                <div id="reaction-status">Ready to start reaction</div>
+                
+                <!-- Virtual Assistant -->
+                <div class="assistant" id="assistant">
+                    <div class="speech-bubble" id="speech-bubble"></div>
+                </div>
+            </div>
+            
+            <div class="data-display">
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" data-tab="concentration">Concentration vs Time</button>
+                        <button class="tab-button" data-tab="ln-concentration">ln[Ester] vs Time</button>
+                        <button class="tab-button" data-tab="inverse-concentration">1/[Ester] vs Time</button>
+                        <button class="tab-button" data-tab="data-table">Data Table</button>
                     </div>
-                    <div class="mt-4">
-                        <table class="w-full border-collapse">
+                    
+                    <div class="tab-content active" id="concentration-tab">
+                        <div class="chart-container" id="conc-chart"></div>
+                    </div>
+                    
+                    <div class="tab-content" id="ln-concentration-tab">
+                        <div class="chart-container" id="ln-conc-chart"></div>
+                    </div>
+                    
+                    <div class="tab-content" id="inverse-concentration-tab">
+                        <div class="chart-container" id="inv-conc-chart"></div>
+                    </div>
+                    
+                    <div class="tab-content" id="data-table-tab">
+                        <table id="data-table">
                             <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="p-2 border text-left">Time (s)</th>
-                                    <th class="p-2 border text-left">[Ester] (M)</th>
-                                    <th class="p-2 border text-left">[OH⁻] (M)</th>
-                                    <th class="p-2 border text-left">Rate (M/s)</th>
+                                <tr>
+                                    <th>Time (s)</th>
+                                    <th>[Ester] (M)</th>
+                                    <th>ln[Ester]</th>
+                                    <th>1/[Ester] (M⁻¹)</th>
                                 </tr>
                             </thead>
-                            <tbody id="data-table">
+                            <tbody>
                                 <!-- Data will be inserted here -->
                             </tbody>
                         </table>
@@ -154,221 +483,581 @@
                 </div>
             </div>
         </div>
-
-        <!-- Theory Section -->
-        <div class="bg-white p-6 rounded-xl shadow-lg mt-8">
-            <h2 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Theory Behind Ester Hydrolysis</h2>
-            <div class="prose max-w-none">
-                <p>Ester hydrolysis is the reaction of an ester with water to form a carboxylic acid and an alcohol. In basic conditions (using NaOH), the reaction is irreversible and follows second-order kinetics:</p>
-                <p class="text-center font-bold my-4">RCOOR' + OH⁻ → RCOO⁻ + R'OH</p>
-                <p>The rate law for this reaction is: <span class="font-bold">Rate = k[ester][OH⁻]</span></p>
-                <p>For pseudo-first order conditions (when [OH⁻] is much greater than [ester]), the rate law simplifies to: <span class="font-bold">Rate = k'[ester]</span>, where k' = k[OH⁻]</p>
-                <p>The rate constant (k) can be determined by measuring the concentration of ester over time and fitting the data to the appropriate rate law equation.</p>
-                <p>The Arrhenius equation relates the rate constant to temperature: <span class="font-bold">k = Ae<sup>-Ea/RT</sup></span>, where A is the pre-exponential factor, Ea is the activation energy, R is the gas constant, and T is the temperature in Kelvin.</p>
-            </div>
-        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // DOM Elements
-        const esterTypeSelect = document.getElementById('ester-type');
+        // Global variables
+        let reactionInterval;
+        let currentTime = 0;
+        let currentConc = 0.5;
+        let rateConstant = 0;
+        let reactionData = [];
+        let isPaused = false;
+        let concChart, lnConcChart, invConcChart;
+        let selectedEster = "ethyl";
+        let speechSynthesis = window.speechSynthesis;
+        
+        // DOM elements
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const reactionStatus = document.getElementById('reaction-status');
+        const liquid = document.getElementById('liquid');
+        const bubbles = document.getElementById('bubbles');
+        const conditionRadios = document.querySelectorAll('input[name="condition"]');
+        const esterConcSlider = document.getElementById('ester-conc');
+        const catalystConcSlider = document.getElementById('catalyst-conc');
         const temperatureSlider = document.getElementById('temperature');
-        const tempValueDisplay = document.getElementById('temp-value');
-        const startExperimentBtn = document.getElementById('start-experiment');
-        const resultsDiv = document.getElementById('results');
-        const kValue = document.getElementById('k-value');
-        const halfLife = document.getElementById('half-life');
-        const activationEnergy = document.getElementById('activation-energy');
-        const reactionMixture = document.getElementById('reaction-mixture');
-        const thermometer = document.getElementById('thermometer');
-        const dataTable = document.getElementById('data-table');
-
-        // Chart instances
-        let concentrationChart, ratePlot, arrheniusPlot;
-
-        // Initialize charts
-        function initCharts() {
-            // Concentration vs Time Chart
-            const concentrationCtx = document.getElementById('concentration-chart').getContext('2d');
-            concentrationChart = new Chart(concentrationCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: '[Ester] (M)',
-                            data: [],
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.1,
-                            fill: false
-                        },
-                        {
-                            label: '[OH⁻] (M)',
-                            data: [],
-                            borderColor: 'rgb(255, 99, 132)',
-                            tension: 0.1,
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: {
-                                display: true,
-                                text: 'Concentration (M)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Time (s)'
-                            }
-                        }
-                    }
+        const esterConcValue = document.getElementById('ester-conc-value');
+        const catalystConcValue = document.getElementById('catalyst-conc-value');
+        const temperatureValue = document.getElementById('temperature-value');
+        const rateConstantDisplay = document.getElementById('rate-constant');
+        const halfLifeDisplay = document.getElementById('half-life');
+        const reactionOrderDisplay = document.getElementById('reaction-order');
+        const dataTableBody = document.querySelector('#data-table tbody');
+        const testTubes = document.querySelectorAll('.test-tube');
+        const assistant = document.getElementById('assistant');
+        const speechBubble = document.getElementById('speech-bubble');
+        const helpBtn = document.getElementById('help-btn');
+        
+        // Lab assistant messages
+        const assistantMessages = {
+            welcome: "Welcome to the Ester Hydrolysis Virtual Lab! Select an ester and conditions to begin.",
+            esterSelected: "Excellent choice! Now set your concentrations and temperature.",
+            acidicSelected: "Acidic hydrolysis selected. This follows pseudo-first order kinetics.",
+            basicSelected: "Basic hydrolysis selected. This follows second order kinetics.",
+            reactionStarted: "Reaction started! Observe how the concentration changes over time.",
+            reactionPaused: "Reaction paused. You can resume or reset the experiment.",
+            reactionComplete: "Reaction complete! Check your results and graphs.",
+            help: "Need help? Select an ester, set your conditions, and click Start Reaction. I'll guide you through the process!"
+        };
+        
+        // Speak a message
+        function speak(message) {
+            if (speechSynthesis) {
+                // Cancel any ongoing speech
+                speechSynthesis.cancel();
+                
+                // Create and speak the utterance
+                const utterance = new SpeechSynthesisUtterance(message);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                
+                // Show speech bubble
+                speechBubble.textContent = message;
+                speechBubble.style.display = 'block';
+                assistant.classList.add('talking');
+                
+                // Hide bubble when speech ends
+                utterance.onend = function() {
+                    setTimeout(() => {
+                        speechBubble.style.display = 'none';
+                        assistant.classList.remove('talking');
+                    }, 2000);
+                };
+                
+                speechSynthesis.speak(utterance);
+            } else {
+                // Fallback if speech synthesis isn't available
+                alert(message);
+            }
+        }
+        
+        // Show assistant message with delay
+        function showAssistantMessage(message, delay = 0) {
+            setTimeout(() => {
+                speak(message);
+            }, delay);
+        }
+        
+        // Initialize assistant
+        function initAssistant() {
+            // Initial welcome message
+            setTimeout(() => {
+                showAssistantMessage(assistantMessages.welcome);
+            }, 1000);
+            
+            // Help button
+            helpBtn.addEventListener('click', () => {
+                showAssistantMessage(assistantMessages.help);
+            });
+            
+            // Assistant click
+            assistant.addEventListener('click', () => {
+                // Give context-appropriate help
+                if (currentTime === 0 && reactionData.length === 0) {
+                    showAssistantMessage(assistantMessages.welcome);
+                } else if (reactionData.length > 0 && currentConc > 0) {
+                    showAssistantMessage("The reaction is in progress. Observe the concentration changes on the graphs.");
+                } else if (currentConc <= 0) {
+                    showAssistantMessage(assistantMessages.reactionComplete);
                 }
             });
-
-            // Rate Plot (Integrated Rate Law)
-            const rateCtx = document.getElementById('rate-plot').getContext('2d');
-            ratePlot = new Chart(rateCtx, {
-                type: 'scatter',
+        }
+        
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                // Update active tab button
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update active tab content
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Update slider value displays
+        esterConcSlider.addEventListener('input', () => {
+            esterConcValue.textContent = `${esterConcSlider.value} M`;
+        });
+        
+        catalystConcSlider.addEventListener('input', () => {
+            catalystConcValue.textContent = `${catalystConcSlider.value} M`;
+        });
+        
+        temperatureSlider.addEventListener('input', () => {
+            temperatureValue.textContent = `${temperatureSlider.value} °C`;
+        });
+        
+        // Test tube selection
+        testTubes.forEach(tube => {
+            tube.addEventListener('click', () => {
+                // Update selected test tube
+                testTubes.forEach(t => t.classList.remove('selected'));
+                tube.classList.add('selected');
+                
+                // Update selected ester
+                selectedEster = tube.getAttribute('data-ester');
+                
+                // Assistant feedback
+                showAssistantMessage(`${tube.querySelector('.test-tube-label').textContent} selected. ${assistantMessages.esterSelected}`);
+            });
+        });
+        
+        // Condition selection
+        conditionRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    const condition = radio.value;
+                    showAssistantMessage(assistantMessages[`${condition}Selected`]);
+                }
+            });
+        });
+        
+        // Initialize charts
+        function initializeCharts() {
+            // Concentration vs Time chart
+            const concCtx = document.createElement('canvas');
+            document.getElementById('conc-chart').appendChild(concCtx);
+            concChart = new Chart(concCtx, {
+                type: 'line',
                 data: {
                     datasets: [{
-                        label: 'Experimental Data',
-                        data: [],
-                        backgroundColor: 'rgb(54, 162, 235)'
-                    }, {
-                        label: 'Best Fit Line',
-                        data: [],
-                        type: 'line',
-                        borderColor: 'rgb(255, 99, 132)',
-                        borderWidth: 2,
-                        fill: false,
-                        pointRadius: 0
+                        label: '[Ester] (M)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1,
+                        data: []
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (s)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Concentration (M)'
+                            },
+                            min: 0
+                        }
+                    }
+                }
+            });
+            
+            // ln[Ester] vs Time chart
+            const lnConcCtx = document.createElement('canvas');
+            document.getElementById('ln-conc-chart').appendChild(lnConcCtx);
+            lnConcChart = new Chart(lnConcCtx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'ln[Ester]',
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.1,
+                        data: []
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (s)'
+                            }
+                        },
                         y: {
                             title: {
                                 display: true,
                                 text: 'ln[Ester]'
                             }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Time (s)'
-                            }
                         }
                     }
                 }
             });
-
-            // Arrhenius Plot
-            const arrheniusCtx = document.getElementById('arrhenius-plot').getContext('2d');
-            arrheniusPlot = new Chart(arrheniusCtx, {
-                type: 'scatter',
+            
+            // 1/[Ester] vs Time chart
+            const invConcCtx = document.createElement('canvas');
+            document.getElementById('inv-conc-chart').appendChild(invConcCtx);
+            invConcChart = new Chart(invConcCtx, {
+                type: 'line',
                 data: {
                     datasets: [{
-                        label: 'Experimental Data',
-                        data: [],
-                        backgroundColor: 'rgb(153, 102, 255)'
-                    }, {
-                        label: 'Best Fit Line',
-                        data: [],
-                        type: 'line',
-                        borderColor: 'rgb(255, 159, 64)',
-                        borderWidth: 2,
-                        fill: false,
-                        pointRadius: 0
+                        label: '1/[Ester] (M⁻¹)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.1,
+                        data: []
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'ln(k)'
-                            }
-                        },
                         x: {
                             title: {
                                 display: true,
-                                text: '1/T (K⁻¹)'
+                                text: 'Time (s)'
                             }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '1/[Ester] (M⁻¹)'
+                            },
+                            min: 0
                         }
                     }
                 }
             });
         }
-
-        // Update thermometer display
-        function updateThermometer() {
-            const temp = parseInt(temperatureSlider.value);
-            const heightPercentage = ((temp - 20) / 60) * 100;
-            thermometer.style.height = `${heightPercentage}%`;
+        
+        // Calculate rate constant based on conditions
+        function calculateRateConstant() {
+            const condition = document.querySelector('input[name="condition"]:checked').value;
+            const temp = parseFloat(temperatureSlider.value);
             
-            // Change color based on temperature
-            if (temp < 30) {
-                thermometer.style.backgroundColor = '#3b82f6'; // blue
-            } else if (temp < 50) {
-                thermometer.style.backgroundColor = '#10b981'; // green
-            } else {
-                thermometer.style.backgroundColor = '#ef4444'; // red
-            }
-        }
-
-        // Generate simulated data
-        function generateData(esterType, temperature, concentration, order) {
-            const data = [];
-            const timePoints = 20;
-            const maxTime = order === '1' ? 300 : 600;
-            
-            // Base rate constant (adjusted for temperature via Arrhenius equation)
-            const Ea = 50; // kJ/mol
-            const A = 1e8; // pre-exponential factor
-            const R = 0.008314; // kJ/(mol·K)
-            const T = temperature + 273.15; // Kelvin
-            const k = A * Math.exp(-Ea/(R * T));
-            
-            // Initial concentrations
-            let esterInitial = 0.05;
-            let ohInitial = parseFloat(concentration);
-            
-            // Adjust for ester type
-            const esterFactors = {
-                'methyl-acetate': 1.0,
-                'ethyl-acetate': 0.8,
-                'propyl-acetate': 0.6,
-                'butyl-acetate': 0.4
-            };
-            const esterFactor = esterFactors[esterType];
-            const adjustedK = k * esterFactor;
-            
-            // Generate data points
-            for (let i = 0; i <= timePoints; i++) {
-                const t = (i / timePoints) * maxTime;
-                let esterConc, ohConc;
-                
-                if (order === '1') {
-                    // Pseudo-first order kinetics
-                    const kPrime = adjustedK * ohInitial;
-                    esterConc = esterInitial * Math.exp(-kPrime * t);
-                    ohConc = ohInitial - (esterInitial - esterConc);
-                } else {
-                    // Second order kinetics
-                    const x = (esterInitial * ohInitial * (1 - Math.exp(-adjustedK * (ohInitial - esterInitial) * t))) / 
-                              (ohInitial - esterInitial * Math.exp(-adjustedK * (ohInitial - esterInitial) * t));
-                    esterConc = esterInitial - x;
-                    ohConc = ohInitial - x;
+            // Base rate constants at 25°C (simplified model)
+            const baseRates = {
+                'methyl': {
+                    'acidic': 0.001,
+                    'basic': 0.01
+                },
+                'ethyl': {
+                    'acidic': 0.0005,
+                    'basic': 0.005
+                },
+                'propyl': {
+                    'acidic': 0.0003,
+                    'basic': 0.003
                 }
+            };
+            
+            // Adjust for temperature using Arrhenius equation (simplified)
+            const tempFactor = Math.exp(0.05 * (temp - 25));
+            
+            return baseRates[selectedEster][condition] * tempFactor;
+        }
+        
+        // Simulate reaction progress
+        function simulateReaction() {
+            const initialConc = parseFloat(esterConcSlider.value);
+            const condition = document.querySelector('input[name="condition"]:checked').value;
+            
+            // Calculate concentration at current time
+            if (condition === 'acidic') {
+                // Pseudo-first order kinetics for acidic hydrolysis
+                currentConc = initialConc * Math.exp(-rateConstant * currentTime);
+            } else {
+                // Second order kinetics for basic hydrolysis
+                const catalystConc = parseFloat(catalystConcSlider.value);
+                currentConc = initialConc / (1 + initialConc * rateConstant * currentTime);
+            }
+            
+            // Update progress bar
+            const progress = (1 - currentConc / initialConc) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // Update liquid level in flask (visual only)
+            liquid.style.height = `${50 + (currentConc / initialConc) * 50}%`;
+            
+            // Add bubbles if reaction is progressing
+            if (progress > 0 && progress < 100) {
+                addBubbles();
+            }
+            
+            // Add data point
+            const dataPoint = {
+                time: currentTime,
+                concentration: currentConc,
+                lnConcentration: Math.log(currentConc),
+                inverseConcentration: 1 / currentConc
+            };
+            
+            reactionData.push(dataPoint);
+            
+            // Update charts
+            updateCharts();
+            
+            // Update data table
+            updateDataTable();
+            
+            // Update reaction status
+            reactionStatus.textContent = `Reaction in progress (${progress.toFixed(1)}% complete)`;
+            
+            // Check if reaction is complete
+            if (currentConc < initialConc * 0.01) {
+                clearInterval(reactionInterval);
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                reactionStatus.textContent = 'Reaction complete';
+                showAssistantMessage(assistantMessages.reactionComplete);
+            }
+            
+            currentTime += 1;
+        }
+        
+        // Add bubbles to flask animation
+        function addBubbles() {
+            // Clear existing bubbles
+            bubbles.innerHTML = '';
+            
+            // Add 3-5 bubbles
+            const bubbleCount = Math.floor(Math.random() * 3) + 3;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                // Random size (3-8px)
+                const size = Math.floor(Math.random() * 6) + 3;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                // Random horizontal position
+                bubble.style.left = `${Math.random() * 80 + 10}%`;
+                
+                // Random animation duration (2-5s)
+                const duration = Math.random() * 3 + 2;
+                bubble.style.animationDuration = `${duration}s`;
+                
+                // Random delay (0-2s)
+                bubble.style.animationDelay = `${Math.random() * 2}s`;
+                
+                bubbles.appendChild(bubble);
             }
         }
-    
+        
+        // Update charts with new data
+        function updateCharts() {
+            // Concentration vs Time
+            concChart.data.labels = reactionData.map(point => point.time);
+            concChart.data.datasets[0].data = reactionData.map(point => point.concentration);
+            concChart.update();
+            
+            // ln[Ester] vs Time
+            lnConcChart.data.labels = reactionData.map(point => point.time);
+            lnConcChart.data.datasets[0].data = reactionData.map(point => point.lnConcentration);
+            lnConcChart.update();
+            
+            // 1/[Ester] vs Time
+            invConcChart.data.labels = reactionData.map(point => point.time);
+            invConcChart.data.datasets[0].data = reactionData.map(point => point.inverseConcentration);
+            invConcChart.update();
+            
+            // Calculate and display rate constant if we have enough data
+            if (reactionData.length > 5) {
+                calculateAndDisplayResults();
+            }
+        }
+        
+        // Update data table
+        function updateDataTable() {
+            dataTableBody.innerHTML = '';
+            
+            // Show only every 5th data point to keep table manageable
+            for (let i = 0; i < reactionData.length; i += 5) {
+                const point = reactionData[i];
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${point.time.toFixed(1)}</td>
+                    <td>${point.concentration.toFixed(4)}</td>
+                    <td>${point.lnConcentration.toFixed(4)}</td>
+                    <td>${point.inverseConcentration.toFixed(2)}</td>
+                `;
+                
+                dataTableBody.appendChild(row);
+            }
+            
+            // Always show last point
+            if (reactionData.length > 0) {
+                const lastPoint = reactionData[reactionData.length - 1];
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${lastPoint.time.toFixed(1)}</td>
+                    <td>${lastPoint.concentration.toFixed(4)}</td>
+                    <td>${lastPoint.lnConcentration.toFixed(4)}</td>
+                    <td>${lastPoint.inverseConcentration.toFixed(2)}</td>
+                `;
+                
+                dataTableBody.appendChild(row);
+            }
+        }
+        
+        // Calculate and display results
+        function calculateAndDisplayResults() {
+            const condition = document.querySelector('input[name="condition"]:checked').value;
+            
+            if (condition === 'acidic') {
+                // Pseudo-first order kinetics
+                // The rate constant is the negative slope of ln[Ester] vs time
+                const x = reactionData.map(point => point.time);
+                const y = reactionData.map(point => point.lnConcentration);
+                
+                // Simple linear regression for slope
+                const n = x.length;
+                const sumX = x.reduce((a, b) => a + b, 0);
+                const sumY = y.reduce((a, b) => a + b, 0);
+                const sumXY = x.reduce((a, val, i) => a + val * y[i], 0);
+                const sumX2 = x.reduce((a, b) => a + b * b, 0);
+                
+                const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                const k = -slope;
+                const halfLife = (0.693 / k).toFixed(2);
+                
+                rateConstantDisplay.innerHTML = `Rate Constant (k): ${k.toExponential(3)} s<sup>-1</sup>`;
+                halfLifeDisplay.innerHTML = `Half-life (t<sub>½</sub>): ${halfLife} s`;
+                reactionOrderDisplay.textContent = 'Reaction Order: Pseudo-first order';
+            } else {
+                // Second order kinetics
+                // The rate constant is the slope of 1/[Ester] vs time
+                const x = reactionData.map(point => point.time);
+                const y = reactionData.map(point => point.inverseConcentration);
+                
+                // Simple linear regression for slope
+                const n = x.length;
+                const sumX = x.reduce((a, b) => a + b, 0);
+                const sumY = y.reduce((a, b) => a + b, 0);
+                const sumXY = x.reduce((a, val, i) => a + val * y[i], 0);
+                const sumX2 = x.reduce((a, b) => a + b * b, 0);
+                
+                const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                const k = slope;
+                const initialConc = parseFloat(esterConcSlider.value);
+                const halfLife = (1 / (initialConc * k)).toFixed(2);
+                
+                rateConstantDisplay.innerHTML = `Rate Constant (k): ${k.toExponential(3)} M<sup>-1</sup>s<sup>-1</sup>`;
+                halfLifeDisplay.innerHTML = `Half-life (t<sub>½</sub>): ${halfLife} s`;
+                reactionOrderDisplay.textContent = 'Reaction Order: Second order';
+            }
+        }
+        
+        // Start reaction
+        startBtn.addEventListener('click', () => {
+            // Reset if this is a new reaction
+            if (currentTime === 0 || reactionData.length === 0) {
+                currentConc = parseFloat(esterConcSlider.value);
+                reactionData = [];
+                updateCharts();
+                updateDataTable();
+            }
+            
+            // Calculate rate constant based on conditions
+            rateConstant = calculateRateConstant();
+            
+            // Start simulation
+            reactionInterval = setInterval(simulateReaction, 500);
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            reactionStatus.textContent = 'Reaction in progress';
+            
+            // Assistant feedback
+            showAssistantMessage(assistantMessages.reactionStarted);
+        });
+        
+        // Pause reaction
+        pauseBtn.addEventListener('click', () => {
+            if (isPaused) {
+                // Resume
+                reactionInterval = setInterval(simulateReaction, 500);
+                pauseBtn.textContent = 'Pause';
+                reactionStatus.textContent = 'Reaction in progress';
+                showAssistantMessage("Reaction resumed. Continue observing the changes.");
+            } else {
+                // Pause
+                clearInterval(reactionInterval);
+                pauseBtn.textContent = 'Resume';
+                reactionStatus.textContent = 'Reaction paused';
+                showAssistantMessage(assistantMessages.reactionPaused);
+            }
+            
+            isPaused = !isPaused;
+        });
+        
+        // Reset reaction
+        resetBtn.addEventListener('click', () => {
+            clearInterval(reactionInterval);
+            currentTime = 0;
+            currentConc = parseFloat(esterConcSlider.value);
+            reactionData = [];
+            progressBar.style.width = '0%';
+            liquid.style.height = '100%';
+            bubbles.innerHTML = '';
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = 'Pause';
+            isPaused = false;
+            reactionStatus.textContent = 'Ready to start reaction';
+            
+            rateConstantDisplay.textContent = 'Rate Constant (k): --';
+            halfLifeDisplay.textContent = 'Half-life (t½): --';
+            reactionOrderDisplay.textContent = 'Reaction Order: --';
+            
+            updateCharts();
+            updateDataTable();
+            
+            // Assistant feedback
+            showAssistantMessage("Experiment reset. You can start a new reaction now.");
+        });
+        
+        // Initialize the app
+        function init() {
+            initializeCharts();
+            esterConcSlider.dispatchEvent(new Event('input'));
+            catalystConcSlider.dispatchEvent(new Event('input'));
+            temperatureSlider.dispatchEvent(new Event('input'));
+            initAssistant();
+        }
+        
+        // Start the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
 </html>
