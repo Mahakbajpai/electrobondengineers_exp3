@@ -1,1 +1,1 @@
-### Aim of the experiment
+### Determination of rate constant of hydrolysis of esters
