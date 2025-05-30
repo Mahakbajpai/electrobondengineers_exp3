@@ -1,39 +1,35 @@
 ## Theory: Determination of Rate Constant of Hydrolysis of Esters
 
-Imagine esters as little chemical “locks” that need the “key” of water to open up and release their hidden treasures — alcohol and carboxylic acid. This unlocking process is called **hydrolysis**.
+Ester hydrolysis is a reaction where an ester reacts with water, usually in the presence of an acid or base catalyst, to produce an alcohol and a carboxylic acid. The general reaction is:
 
-### The Chemistry Behind the Magic
+Ester + Water → Alcohol + Carboxylic Acid
 
-In the presence of an acid catalyst, the ester’s carbonyl group gets a friendly “push” (protonation), making it easier for water molecules to attack and break the bond. Think of the acid as a helpful guide that speeds up the reaction party!
+### Acid-Catalyzed Hydrolysis
 
-### Watching Time and Change: Reaction Kinetics
+In acid-catalyzed hydrolysis, the ester’s carbonyl oxygen is protonated, making it more reactive towards water. This speeds up the reaction.
 
-Since water is everywhere in excess, the hydrolysis acts like a race controlled mainly by the ester molecules. This means the reaction follows **pseudo-first-order kinetics**—its speed depends mostly on how many ester molecules are left.
+### Reaction Kinetics and Rate Law
 
-Mathematically, the rate looks like this:
+When water is in large excess, the hydrolysis follows pseudo-first-order kinetics with respect to the ester concentration. The rate law is:
 
-\[
-\text{Rate} = k \times [\text{Ester}]
-\]
+Rate = k [Ester]
 
-where **k** is the all-important rate constant that tells us how fast the reaction runs.
+where k is the rate constant.
 
-### Cracking the Code: Finding the Rate Constant
+### Determining the Rate Constant
 
-By measuring the ester concentration as the reaction unfolds over time, we can use this formula:
+By measuring the ester concentration at different times, the rate constant k can be found using the integrated rate equation for a first-order reaction:
 
-\[
-\ln [\text{Ester}] = -kt + \ln [\text{Ester}]_0
-\]
+ln [Ester] = -kt + ln [Ester]_0
 
-Plotting \ln [\text{Ester}] against time gives a straight line, and the slope of this line is -k. Voilà! We’ve found our rate constant.
+A plot of ln [Ester] vs. time t will be a straight line with slope -k.
 
-### What Affects the Race?
+### Factors Affecting Rate Constant
 
-- **Temperature:** Turn up the heat, and the reaction sprints faster.
-- **Acid Concentration:** More guides, faster reaction.
-- **Ester Structure:** Some locks are easier to open than others.
+- Temperature (higher temperature increases k)
+- Acid catalyst concentration
+- Structure of the ester
 
-### Why It Matters
+### Importance
 
-Knowing the rate constant is like knowing the speed limit of a chemical reaction highway. It helps chemists design better reactions, improve product yields, and understand how molecules behave — essential for industries from pharmaceuticals to plastics!
+Understanding the rate constant helps in studying reaction mechanisms and is useful in chemical manufacturing and research.
