@@ -1,13 +1,374 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<!-- Add CSS at the head of HTML file -->
-    <link rel="stylesheet" href="./css/main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ester Hydrolysis Rate Constant Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        .custom-radio input:checked + label {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .reaction-flask {
+            animation: bubble 2s infinite;
+        }
+        @keyframes bubble {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .thermometer {
+            transition: height 0.5s ease;
+        }
+    </style>
 </head>
-<body>
-		<!-- Your code goes here-->
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-blue-800 mb-2">Ester Hydrolysis Rate Constant Simulator</h1>
+            <p class="text-lg text-gray-600">Interactive simulation for determining the rate constant of ester hydrolysis reactions</p>
+        </header>
 
-	<!-- Add JS at the bottom of HTML file --> 
-        <script src="./js/main.js"></script>
-</body>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Control Panel -->
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Experiment Controls</h2>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Ester Type</label>
+                    <select id="ester-type" class="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500">
+                        <option value="methyl-acetate">Methyl Acetate</option>
+                        <option value="ethyl-acetate">Ethyl Acetate</option>
+                        <option value="propyl-acetate">Propyl Acetate</option>
+                        <option value="butyl-acetate">Butyl Acetate</option>
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Temperature (°C)</label>
+                    <input type="range" id="temperature" min="20" max="80" value="25" class="w-full mb-2">
+                    <div class="flex justify-between">
+                        <span>20°C</span>
+                        <span id="temp-value" class="font-bold">25°C</span>
+                        <span>80°C</span>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">NaOH Concentration (M)</label>
+                    <div class="flex space-x-4">
+                        <div class="custom-radio flex-1">
+                            <input type="radio" name="concentration" id="conc-01" value="0.1" checked class="hidden">
+                            <label for="conc-01" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">0.1 M</label>
+                        </div>
+                        <div class="custom-radio flex-1">
+                            <input type="radio" name="concentration" id="conc-02" value="0.2" class="hidden">
+                            <label for="conc-02" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">0.2 M</label>
+                        </div>
+                        <div class="custom-radio flex-1">
+                            <input type="radio" name="concentration" id="conc-05" value="0.5" class="hidden">
+                            <label for="conc-05" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">0.5 M</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Reaction Order</label>
+                    <div class="flex space-x-4">
+                        <div class="custom-radio flex-1">
+                            <input type="radio" name="order" id="order-1" value="1" checked class="hidden">
+                            <label for="order-1" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">First Order</label>
+                        </div>
+                        <div class="custom-radio flex-1">
+                            <input type="radio" name="order" id="order-2" value="2" class="hidden">
+                            <label for="order-2" class="block text-center p-2 border rounded cursor-pointer hover:bg-blue-50">Second Order</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="start-experiment" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition duration-300 flex items-center justify-center">
+                    <i class="fas fa-flask mr-2"></i> Start Experiment
+                </button>
+
+                <div id="results" class="mt-6 hidden">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-bold text-blue-800 mb-2">Results</h3>
+                        <p class="mb-1">Rate Constant (k): <span id="k-value" class="font-bold">0.00</span> M<sup>-1</sup>s<sup>-1</sup></p>
+                        <p class="mb-1">Half-life (t<sub>½</sub>): <span id="half-life" class="font-bold">0.00</span> s</p>
+                        <p>Activation Energy (E<sub>a</sub>): <span id="activation-energy" class="font-bold">0.00</span> kJ/mol</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization Area -->
+            <div class="lg:col-span-2">
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                    <h2 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Reaction Progress</h2>
+                    <div class="flex flex-col md:flex-row items-center justify-between">
+                        <div class="relative w-48 h-64 mb-4 md:mb-0">
+                            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-40 bg-blue-100 rounded-b-full border border-gray-300 overflow-hidden">
+                                <div id="reaction-mixture" class="absolute bottom-0 w-full h-3/4 bg-yellow-100"></div>
+                                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center reaction-flask">
+                                    <i class="fas fa-temperature-high text-red-500"></i>
+                                </div>
+                            </div>
+                            <div class="absolute -right-4 top-8 w-6 h-40 bg-gray-200 rounded-full border border-gray-400">
+                                <div id="thermometer" class="absolute bottom-0 w-full bg-red-500 rounded-full thermometer" style="height: 20%;"></div>
+                            </div>
+                        </div>
+                        <div class="flex-1 w-full">
+                            <canvas id="concentration-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Data Analysis</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <canvas id="rate-plot" height="200"></canvas>
+                            <p class="text-center text-sm text-gray-600 mt-2">Integrated Rate Law Plot</p>
+                        </div>
+                        <div>
+                            <canvas id="arrhenius-plot" height="200"></canvas>
+                            <p class="text-center text-sm text-gray-600 mt-2">Arrhenius Plot</p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="p-2 border text-left">Time (s)</th>
+                                    <th class="p-2 border text-left">[Ester] (M)</th>
+                                    <th class="p-2 border text-left">[OH⁻] (M)</th>
+                                    <th class="p-2 border text-left">Rate (M/s)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-table">
+                                <!-- Data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theory Section -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mt-8">
+            <h2 class="text-2xl font-semibold text-blue-700 mb-4 border-b pb-2">Theory Behind Ester Hydrolysis</h2>
+            <div class="prose max-w-none">
+                <p>Ester hydrolysis is the reaction of an ester with water to form a carboxylic acid and an alcohol. In basic conditions (using NaOH), the reaction is irreversible and follows second-order kinetics:</p>
+                <p class="text-center font-bold my-4">RCOOR' + OH⁻ → RCOO⁻ + R'OH</p>
+                <p>The rate law for this reaction is: <span class="font-bold">Rate = k[ester][OH⁻]</span></p>
+                <p>For pseudo-first order conditions (when [OH⁻] is much greater than [ester]), the rate law simplifies to: <span class="font-bold">Rate = k'[ester]</span>, where k' = k[OH⁻]</p>
+                <p>The rate constant (k) can be determined by measuring the concentration of ester over time and fitting the data to the appropriate rate law equation.</p>
+                <p>The Arrhenius equation relates the rate constant to temperature: <span class="font-bold">k = Ae<sup>-Ea/RT</sup></span>, where A is the pre-exponential factor, Ea is the activation energy, R is the gas constant, and T is the temperature in Kelvin.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const esterTypeSelect = document.getElementById('ester-type');
+        const temperatureSlider = document.getElementById('temperature');
+        const tempValueDisplay = document.getElementById('temp-value');
+        const startExperimentBtn = document.getElementById('start-experiment');
+        const resultsDiv = document.getElementById('results');
+        const kValue = document.getElementById('k-value');
+        const halfLife = document.getElementById('half-life');
+        const activationEnergy = document.getElementById('activation-energy');
+        const reactionMixture = document.getElementById('reaction-mixture');
+        const thermometer = document.getElementById('thermometer');
+        const dataTable = document.getElementById('data-table');
+
+        // Chart instances
+        let concentrationChart, ratePlot, arrheniusPlot;
+
+        // Initialize charts
+        function initCharts() {
+            // Concentration vs Time Chart
+            const concentrationCtx = document.getElementById('concentration-chart').getContext('2d');
+            concentrationChart = new Chart(concentrationCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: '[Ester] (M)',
+                            data: [],
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1,
+                            fill: false
+                        },
+                        {
+                            label: '[OH⁻] (M)',
+                            data: [],
+                            borderColor: 'rgb(255, 99, 132)',
+                            tension: 0.1,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Concentration (M)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (s)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Rate Plot (Integrated Rate Law)
+            const rateCtx = document.getElementById('rate-plot').getContext('2d');
+            ratePlot = new Chart(rateCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Experimental Data',
+                        data: [],
+                        backgroundColor: 'rgb(54, 162, 235)'
+                    }, {
+                        label: 'Best Fit Line',
+                        data: [],
+                        type: 'line',
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'ln[Ester]'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (s)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Arrhenius Plot
+            const arrheniusCtx = document.getElementById('arrhenius-plot').getContext('2d');
+            arrheniusPlot = new Chart(arrheniusCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Experimental Data',
+                        data: [],
+                        backgroundColor: 'rgb(153, 102, 255)'
+                    }, {
+                        label: 'Best Fit Line',
+                        data: [],
+                        type: 'line',
+                        borderColor: 'rgb(255, 159, 64)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'ln(k)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '1/T (K⁻¹)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update thermometer display
+        function updateThermometer() {
+            const temp = parseInt(temperatureSlider.value);
+            const heightPercentage = ((temp - 20) / 60) * 100;
+            thermometer.style.height = `${heightPercentage}%`;
+            
+            // Change color based on temperature
+            if (temp < 30) {
+                thermometer.style.backgroundColor = '#3b82f6'; // blue
+            } else if (temp < 50) {
+                thermometer.style.backgroundColor = '#10b981'; // green
+            } else {
+                thermometer.style.backgroundColor = '#ef4444'; // red
+            }
+        }
+
+        // Generate simulated data
+        function generateData(esterType, temperature, concentration, order) {
+            const data = [];
+            const timePoints = 20;
+            const maxTime = order === '1' ? 300 : 600;
+            
+            // Base rate constant (adjusted for temperature via Arrhenius equation)
+            const Ea = 50; // kJ/mol
+            const A = 1e8; // pre-exponential factor
+            const R = 0.008314; // kJ/(mol·K)
+            const T = temperature + 273.15; // Kelvin
+            const k = A * Math.exp(-Ea/(R * T));
+            
+            // Initial concentrations
+            let esterInitial = 0.05;
+            let ohInitial = parseFloat(concentration);
+            
+            // Adjust for ester type
+            const esterFactors = {
+                'methyl-acetate': 1.0,
+                'ethyl-acetate': 0.8,
+                'propyl-acetate': 0.6,
+                'butyl-acetate': 0.4
+            };
+            const esterFactor = esterFactors[esterType];
+            const adjustedK = k * esterFactor;
+            
+            // Generate data points
+            for (let i = 0; i <= timePoints; i++) {
+                const t = (i / timePoints) * maxTime;
+                let esterConc, ohConc;
+                
+                if (order === '1') {
+                    // Pseudo-first order kinetics
+                    const kPrime = adjustedK * ohInitial;
+                    esterConc = esterInitial * Math.exp(-kPrime * t);
+                    ohConc = ohInitial - (esterInitial - esterConc);
+                } else {
+                    // Second order kinetics
+                    const x = (esterInitial * ohInitial * (1 - Math.exp(-adjustedK * (ohInitial - esterInitial) * t))) / 
+                              (ohInitial - esterInitial * Math.exp(-adjustedK * (ohInitial - esterInitial) * t));
+                    esterConc = esterInitial - x;
+                    ohConc = ohInitial - x;
+                }
+            }
+        }
+    
 </html>
