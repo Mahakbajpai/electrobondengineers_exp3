@@ -2,38 +2,89 @@
   "version": 2.0,
   "questions": [
     {
-      "question": "This is a Sample Question 1?",
+      "question": "What role does the acid catalyst play in ester hydrolysis?",
       "answers": {
-        "a": "answer1",
-        "b": "answer2",
-        "c": "answer3",
-        "d": "answer4"
+        "a": "It speeds up the reaction without being consumed",
+        "b": "It gets consumed during the reaction",
+        "c": "It prevents the reaction",
+        "d": "It converts ester to ketone"
       },
       "explanations": {
-        "a": "Explanation 1  <a href='www.google.com'>here</a>",
-        "b": "Explanation 2",
-        "c": "Explanation 2",
-        "d": "Explanation 2"
+        "a": "Correct! The acid catalyst lowers activation energy and is regenerated.",
+        "b": "Catalysts are not consumed in the reaction.",
+        "c": "The acid catalyst promotes the reaction.",
+        "d": "Esters are not converted to ketones in hydrolysis."
       },
       "correctAnswer": "a",
-      "difficulty": "beginner"
+      "difficulty": "intermediate"
     },
     {
-      "question": "This is a Sample Question 2?",
+      "question": "Which graph is used to determine the rate constant for a first-order ester hydrolysis reaction?",
       "answers": {
-        "a": "answer1",
-        "b": "answer2",
-        "c": "answer3",
-        "d": "answer4"
+        "a": "Concentration vs. time",
+        "b": "Logarithm of concentration vs. time",
+        "c": "Rate vs. concentration",
+        "d": "Volume vs. time"
       },
       "explanations": {
-        "a": "Explanation 1  <a href='www.google.com'>here</a>",
-        "b": "Explanation 2",
-        "c": "Explanation 2",
-        "d": "Explanation 2"
+        "a": "For first-order, a logarithmic plot is preferred.",
+        "b": "Correct! Plotting ln[ester] vs. time yields a straight line for first-order reactions.",
+        "c": "Rate vs. concentration is used for reaction order determination.",
+        "d": "Volume is not typically plotted here."
+      },
+      "correctAnswer": "b",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "If the rate constant doubles when temperature increases by 10°C, what does this imply?",
+      "answers": {
+        "a": "The reaction is temperature-independent",
+        "b": "The reaction is highly sensitive to temperature",
+        "c": "The reaction is zero order",
+        "d": "The catalyst is ineffective"
+      },
+      "explanations": {
+        "a": "Rate constants usually increase with temperature.",
+        "b": "Correct! This follows the Arrhenius equation and indicates sensitivity.",
+        "c": "Order does not determine temperature dependence.",
+        "d": "Catalyst effectiveness is unrelated here."
+      },
+      "correctAnswer": "b",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "What units are typically used for the rate constant in a first-order reaction?",
+      "answers": {
+        "a": "mol/L",
+        "b": "L/mol·s",
+        "c": "s⁻¹",
+        "d": "mol/L·s"
+      },
+      "explanations": {
+        "a": "This is concentration, not a rate constant unit.",
+        "b": "This is typical for second-order reactions.",
+        "c": "Correct! For first-order reactions, rate constant units are reciprocal time.",
+        "d": "This is rate unit."
       },
       "correctAnswer": "c",
       "difficulty": "beginner"
+    },
+    {
+      "question": "Which of these can cause errors in determining the rate constant of ester hydrolysis?",
+      "answers": {
+        "a": "Impurities in reagents",
+        "b": "Inaccurate temperature control",
+        "c": "Errors in pH measurement",
+        "d": "All of the above"
+      },
+      "explanations": {
+        "a": "Impurities can alter reaction rate.",
+        "b": "Temperature affects rate constant significantly.",
+        "c": "pH measurement errors affect monitoring hydrolysis progress.",
+        "d": "Correct! All these can cause errors."
+      },
+      "correctAnswer": "d",
+      "difficulty": "intermediate"
     }
   ]
 }
