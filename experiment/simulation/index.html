@@ -486,6 +486,102 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Theory Modal -->
+<div id="theory-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto;">
+    <div style="background-color: white; margin: 50px auto; padding: 30px; border-radius: 10px; max-width: 800px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0;">Theory of Ester Hydrolysis Kinetics</h2>
+            <button id="close-theory" style="background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Close</button>
+        </div>
+        
+        <div style="line-height: 1.6;">
+            <h3>1. Introduction to Ester Hydrolysis</h3>
+            <p>Ester hydrolysis is the chemical reaction where an ester is cleaved by water into a carboxylic acid (or its conjugate base) and an alcohol. This reaction can occur under either acidic or basic conditions, with different mechanisms and kinetics:</p>
+            
+            <h3>2. Acidic Hydrolysis</h3>
+            <p>Under acidic conditions (using HCl or H<sub>2</sub>SO<sub>4</sub>), the reaction follows a pseudo-first order kinetic mechanism:</p>
+            <p style="text-align: center; font-weight: bold;">RCOOR' + H<sub>2</sub>O ⇌ RCOOH + R'OH</p>
+            <p>Key characteristics:</p>
+            <ul>
+                <li>The reaction is reversible</li>
+                <li>Follows pseudo-first order kinetics because water is in large excess</li>
+                <li>Rate = k[ester]</li>
+                <li>Half-life (t<sub>½</sub>) = ln(2)/k</li>
+            </ul>
+            
+            <h3>3. Basic Hydrolysis (Saponification)</h3>
+            <p>Under basic conditions (using NaOH or KOH), the reaction is irreversible and follows second order kinetics:</p>
+            <p style="text-align: center; font-weight: bold;">RCOOR' + OH<sup>-</sup> → RCOO<sup>-</sup> + R'OH</p>
+            <p>Key characteristics:</p>
+            <ul>
+                <li>The reaction is irreversible</li>
+                <li>Follows second order kinetics (first order with respect to both ester and hydroxide ion)</li>
+                <li>Rate = k[ester][OH<sup>-</sup>]</li>
+                <li>Half-life depends on initial concentrations</li>
+            </ul>
+            
+            <h3>4. Factors Affecting Reaction Rate</h3>
+            <p>The rate of ester hydrolysis is influenced by several factors:</p>
+            <ul>
+                <li><strong>Ester structure:</strong> More sterically hindered esters react slower</li>
+                <li><strong>Temperature:</strong> Rate increases with temperature (Arrhenius equation)</li>
+                <li><strong>Catalyst concentration:</strong> Higher [H<sup>+</sup>] or [OH<sup>-</sup>] increases rate</li>
+                <li><strong>Solvent effects:</strong> Polar solvents generally increase the rate</li>
+            </ul>
+            
+            <h3>5. Kinetic Analysis</h3>
+            <p>To determine the reaction order and rate constant:</p>
+            <ul>
+                <li><strong>First-order:</strong> Plot ln[ester] vs time gives straight line with slope = -k</li>
+                <li><strong>Second-order:</strong> Plot 1/[ester] vs time gives straight line with slope = k</li>
+            </ul>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <button id="close-theory-bottom" style="background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px;">Close Theory Section</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Theory Button to add in header -->
+<script>
+    // Add theory button to header
+    const header = document.querySelector('header div');
+    const theoryBtn = document.createElement('button');
+    theoryBtn.id = 'theory-btn';
+    theoryBtn.textContent = 'Theory';
+    theoryBtn.style.backgroundColor = '#27ae60';
+    header.appendChild(theoryBtn);
+    
+    // Theory modal functionality
+    const theoryModal = document.getElementById('theory-modal');
+    const theoryBtnElement = document.getElementById('theory-btn');
+    const closeTheoryBtns = document.querySelectorAll('#close-theory, #close-theory-bottom');
+    
+    theoryBtnElement.addEventListener('click', () => {
+        theoryModal.style.display = 'block';
+    });
+    
+    closeTheoryBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            theoryModal.style.display = 'none';
+        });
+    });
+    
+    // Close modal when clicking outside content
+    theoryModal.addEventListener('click', (e) => {
+        if (e.target === theoryModal) {
+            theoryModal.style.display = 'none';
+        }
+    });
+    
+    // Assistant can also mention the theory
+    assistant.addEventListener('click', () => {
+        if (currentTime === 0 && reactionData.length === 0 && !theoryModal.style.display === 'block') {
+            showAssistantMessage("Would you like to review the theory behind ester hydrolysis? Click the Theory button in the header.");
+        }
+    });
+</script>
     <script>
         // Global variables
         let reactionInterval;
