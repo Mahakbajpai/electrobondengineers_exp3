@@ -1,0 +1,100 @@
+(function() {
+  function buildQuiz() {
+    const output = [];
+    myQuestions.forEach((currentQuestion, questionNumber) => {
+      const answers = [];
+      for (letter in currentQuestion.answers) {
+        answers.push(
+          `<label>
+            <input type="radio" name="question${questionNumber}" value="${letter}">
+            ${letter} :
+            ${currentQuestion.answers[letter]}
+          </label>`
+        );
+      }
+      output.push(
+        `<div class="question"> ${currentQuestion.question} </div>
+        <div class="answers"> ${answers.join("")} </div>`
+      );
+    });
+    quizContainer.innerHTML = output.join("");
+  }
+
+  function showResults() {
+    const answerContainers = quizContainer.querySelectorAll(".answers");
+    let numCorrect = 0;
+    myQuestions.forEach((currentQuestion, questionNumber) => {
+      const answerContainer = answerContainers[questionNumber];
+      const selector = `input[name=question${questionNumber}]:checked`;
+      const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+      if (userAnswer === currentQuestion.correctAnswer) {
+        numCorrect++;
+      } else {
+        answerContainers[questionNumber].style.color = "red";
+      }
+    });
+    resultsContainer.innerHTML = `${numCorrect} out of ${myQuestions.length}`;
+  }
+
+  const quizContainer = document.getElementById("quiz");
+  const resultsContainer = document.getElementById("results");
+  const submitButton = document.getElementById("submit");
+
+  /////////////////////////////////////////////////////////////////////////////
+  /////////////////////// Do not modify the above code ////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+
+  const myQuestions = [
+    {
+      question: "What role does the acid catalyst play in ester hydrolysis?",
+      answers: {
+        a: "It speeds up the reaction without being consumed",
+        b: "It gets consumed during the reaction",
+        c: "It prevents the reaction",
+        d: "It converts ester to ketone"
+      },
+      correctAnswer: "a"
+    },
+    {
+      question: "Which graph is used to determine the rate constant for a first-order ester hydrolysis reaction?",
+      answers: {
+        a: "Concentration vs. time",
+        b: "Logarithm of concentration vs. time",
+        c: "Rate vs. concentration",
+        d: "Volume vs. time"
+      },
+      correctAnswer: "b"
+    },
+    {
+      question: "If the rate constant doubles when temperature increases by 10°C, what does this imply?",
+      answers: {
+        a: "The reaction is temperature-independent",
+        b: "The reaction is highly sensitive to temperature",
+        c: "The reaction is zero order",
+        d: "The catalyst is ineffective"
+      },
+      correctAnswer: "b"
+    },
+    {
+      question: "What units are typically used for the rate constant in a first-order reaction?",
+      answers: {
+        a: "mol/L",
+        b: "L/mol·s",
+        c: "s⁻¹",
+        d: "mol/L·s"
+      },
+      correctAnswer: "c"
+    },
+    {
+      question: "Which of these can cause errors in determining the rate constant of ester hydrolysis?",
+      answers: {
+        a: "Impurities in reagents",
+        b: "Inaccurate temperature control",
+        c: "Errors in pH measurement",
+        d: "All of the above"
+      },
+      correctAnswer: "d"
+    }
+  ];
+})();
