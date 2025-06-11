@@ -1,3 +1,5 @@
-### Cengel, Y. A., & Ghajar, A. J. (2015). *Heat and mass transfer: Fundamentals and applications* (5th ed.). McGraw-Hill Education.
+### 1. Vogel, A. I. "Vogel's Textbook of Practical Organic Chemistry", 5th Ed., Longman Scientific & Technical, 1989.
 
-Assael, M. J., et al. (2002). Thermal conductivity of liquids: An update on the database of the thermophysical properties of fluids. *International Journal of Thermophysics*.
+2. Pandey, O.P., Bajpai, D.N., Giri, S. "Practical Chemistry", S. Chand Publishing, 2021.
+
+3. Atkins, P., de Paula, J. "Physical Chemistry", 10th Ed., Oxford University Press, 2014.
