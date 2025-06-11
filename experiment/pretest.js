@@ -90,7 +90,7 @@
 
   const myQuestions = [
     {
-      question: "1.What is the general formula of an ester? ",  ///// Write the question inside double quotes
+      question: "What is the general formula of an ester? ",  ///// Write the question inside double quotes
       answers: {
         a: "R-COOH",                  ///// Write the option 1 inside double quotes
         b: "R-COOR'",                  ///// Write the option 2 inside double quotes
@@ -101,7 +101,7 @@
     },
 
     {
-     question: "2.In the hydrolysis of esters under acidic conditions, what is the main product?",  ///// Write the question inside double quotes
+     question: "In the hydrolysis of esters under acidic conditions, what is the main product?",  ///// Write the question inside double quotes
       answers: {
         a: "Alcohol and acid",                  ///// Write the option 1 inside double quotes
         b: "Alcohol and ester",                  ///// Write the option 2 inside double quotes
@@ -111,7 +111,7 @@
       correctAnswer: "a"                ///// Write the correct option inside double quotes
     },     
     {
-      question: "3. Which factor affects the rate constant of ester hydrolysis? ",  ///// Write the question inside double quotes
+      question: " Which factor affects the rate constant of ester hydrolysis? ",  ///// Write the question inside double quotes
        answers: {
          a: " Concentration of ester",                  ///// Write the option 1 inside double quotes
          b: "Type of catalyst",                  ///// Write the option 2 inside double quotes
@@ -121,7 +121,7 @@
        correctAnswer: "d"                ///// Write the correct option inside double quotes
      }, 
      {
-      question: "4.Which method is commonly used to determine the rate constant of hydrolysis of esters?",  ///// Write the question inside double quotes
+      question: "Which method is commonly used to determine the rate constant of hydrolysis of esters?",  ///// Write the question inside double quotes
        answers: {
          a: "Measuring change in pH over time",                  ///// Write the option 1 inside double quotes
          b: " Measuring volume of gas produced",                  ///// Write the option 2 inside double quotes
@@ -132,7 +132,7 @@
      },                              ///// To add more questions, copy the section below 
     									                  ///// this line
       {
-      question: "5.What order of reaction is typically observed for the acid-catalyzed hydrolysis of esters? ",  ///// Write the question inside double quotes
+      question: "What order of reaction is typically observed for the acid-catalyzed hydrolysis of esters? ",  ///// Write the question inside double quotes
        answers: {
          a: "Zero order ",                  ///// Write the option 1 inside double quotes
          b: "First order",                  ///// Write the option 2 inside double quotes
