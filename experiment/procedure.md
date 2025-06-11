@@ -1,4 +1,4 @@
-### 🔬 Procedure: Determination of Rate Constant of Hydrolysis of Esters
+### Procedure: Determination of Rate Constant of Hydrolysis of Esters
 Objective:
 To determine the rate constant (k) of the acid-catalyzed hydrolysis of ethyl acetate using titration method.
 
